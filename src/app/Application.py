@@ -25,7 +25,6 @@ class Application:
         init_logging()
 
 
-
     @property
     def bot_context(self) -> BotContext:
         #set bot username into context
@@ -44,25 +43,17 @@ class Application:
     #run bot event loop
     def start(self, webhook=False | None):
         #TODO: congigure webhook
-        if webhook:
-            pass
+        # if webhook:
+        #     pass
 
         asyncio.run(self._start_polling())
 
+    def register_routers(self, routers: list[Router]):
+        self._dispatcher.include_routers(routers)
 
     async def _run_polling(self):
         await self._bot.delete_webhook(drop_pending_updates=True)
         await self._dispatcher.start_polling(self._bot)
 
 
-    def register_routers(self, routers: list[Router]):
-        self._dispatcher.include_routers(routers)
-    
-    
-    
-
-
-
-
-
-    
+   
