@@ -1,5 +1,5 @@
-from .bot_config import BOT_USERNAME, BsuirAssistantBot, Config, load_config
-from .bot_logger_config import get_logger, init_logging
+from .application import Config, load_config
+from .logger import get_logger, init_logging
 
 __all__ = [
     "BsuirAssistantBot",
