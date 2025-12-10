@@ -1,4 +1,4 @@
-from .GroupChatMsgTrottler import GroupChatMsgTrottler
-from .PrivateChatMsgTrottler import PrivateChatMsgTrottler
+from .RateLimiter import RateLimiter
 
-__all__ = ["PrivateChatMsgTrottler", "GroupChatMsgTrottler"]
+__all__ = ["RateLimiter"]
+
