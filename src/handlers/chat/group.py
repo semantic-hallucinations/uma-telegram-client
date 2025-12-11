@@ -1,15 +1,14 @@
 from aiogram import F, Router
-from aiogram.enums import ChatType, ParseMode
-from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import Message
 
 from app import routers
 from .answer import handle_agent_answer
+from log import log_handler
 
 
 rt: Router = routers["group_chat"]
 
-
+@log_handler("bot.handlers")
 @rt.message(F.reply_to_message, F.text)
 async def reply_message(message: Message):
     replied_text = message.reply_to_message.text
@@ -19,6 +18,7 @@ async def reply_message(message: Message):
         await handle_agent_answer(query, message)
 
 
+@log_handler("bot.handlers")
 @rt.message(F.test)
 async def text_message(message: Message):
     query = __has_context(message.text)
@@ -31,6 +31,7 @@ def __has_context(message: str) -> str:
     return message.split(maxsplit=1)[1] if len(message.split()) > 1 else ""
 
 
+@log_handler("bot.handlers")
 @rt.message(~F.text)
 async def non_text_message(message: Message):
     await message.answer(
