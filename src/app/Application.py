@@ -4,7 +4,7 @@ import asyncio
 from aiogram import Bot, Dispatcher, Router
 
 from config import Config, load_config
-from BotContext import BotContext
+from app.AppContext import BotContext
 from log import init_logging
 
 #Application container class

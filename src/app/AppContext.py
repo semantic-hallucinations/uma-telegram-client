@@ -1,8 +1,9 @@
 from typing import Dict
+from dataclasses import dataclass
 
 from aiogram import Router
 
-
+@dataclass
 class BotContext:
     _username: str
     _router_map: dict
@@ -20,3 +21,9 @@ class BotContext:
     @property
     def routers(self) -> Dict[Router]:
         return self._route_map
+
+@dataclass
+class WebContext:
+    n8n_url: str
+
+
