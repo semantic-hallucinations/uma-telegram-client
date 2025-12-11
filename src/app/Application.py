@@ -3,8 +3,9 @@ from typing import List
 import asyncio
 from aiogram import Bot, Dispatcher, Router
 
-from config import Config, load_config, init_logging
-from app.BotContext import BotContext
+from config import Config, load_config
+from BotContext import BotContext
+from log import init_logging
 
 #Application container class
 class Application:
@@ -48,8 +49,11 @@ class Application:
 
         asyncio.run(self._start_polling())
 
-    def register_routers(self, routers: list[Router]):
+    def set_routers(self, routers: list[Router]):
         self._dispatcher.include_routers(routers)
+
+    def set_error_handler(self, handler):
+        self._dispatcher.errors.register(handler)
 
     async def _run_polling(self):
         await self._bot.delete_webhook(drop_pending_updates=True)
