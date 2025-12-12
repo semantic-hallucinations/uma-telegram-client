@@ -1,12 +1,9 @@
-from typing import Dict
 from dataclasses import dataclass
 
-from aiogram import Router
 
 @dataclass
 class BotContext:
     _username: str
-    _router_map: dict
 
     @property
     def username(self) -> str:
@@ -18,9 +15,6 @@ class BotContext:
         tagged = self._username
         return tagged if tagged.startswith('@') else f"{tagged}"
 
-    @property
-    def routers(self) -> Dict[Router]:
-        return self._route_map
 
 @dataclass
 class WebContext:

@@ -1,7 +1,6 @@
 from aiogram.types import ErrorEvent
-from aiogram.exceptions import TelegramBadRequest
 
-from log import get_logger
+from config import get_logger
 
 
 logger = get_logger("bot.handlers")

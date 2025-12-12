@@ -2,7 +2,6 @@ from collections import defaultdict
 from typing import Any, Callable, Dict
 
 from aiogram import BaseMiddleware
-from aiogram.enums import ChatType
 from aiogram.types import Message
 
 class RateLimiter(BaseMiddleware):

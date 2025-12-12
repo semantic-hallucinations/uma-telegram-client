@@ -7,6 +7,7 @@ class BotEnv:
     token: str
     username: str
 
+
 @dataclass
 class WebEnv:
     n8n_url: str
@@ -31,5 +32,3 @@ def load_config(path: str | None = None) -> Config:
             n8n_url=env("N8N_SERVICE_ADDR")
         )
     )
-
-

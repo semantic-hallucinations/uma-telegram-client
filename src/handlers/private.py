@@ -2,11 +2,12 @@ from aiogram import F, Router
 from aiogram.types import Message
 from aiogram.filters import Command, CommandStart
 
-from app import routers
-from log import log_handler
-from .answer import handle_agent_answer
+from app.routing import private_router
+from config import log_handler
+from web.answer import handle_agent_answer
 
-rt: Router = routers["private_chat"]
+
+rt: Router = private_router
 
 @log_handler("bot.handlers")
 @rt.message(CommandStart())
@@ -39,7 +40,7 @@ async def reply_message(message: Message):
     await handle_agent_answer(query, message)
 
 @log_handler("bot.handlers")
-@rt.message(F.test)
+@rt.message(F.text)
 async def text_message(message: Message):
     await handle_agent_answer(message.text, message)
 

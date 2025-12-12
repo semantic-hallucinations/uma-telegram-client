@@ -1,12 +1,12 @@
 from aiogram import F, Router
 from aiogram.types import Message
 
-from app import routers
-from .answer import handle_agent_answer
-from log import log_handler
+from app.routing import group_router
+from web.answer import handle_agent_answer
+from config import log_handler
 
 
-rt: Router = routers["group_chat"]
+rt: Router = group_router
 
 @log_handler("bot.handlers")
 @rt.message(F.reply_to_message, F.text)
@@ -19,7 +19,7 @@ async def reply_message(message: Message):
 
 
 @log_handler("bot.handlers")
-@rt.message(F.test)
+@rt.message(F.text)
 async def text_message(message: Message):
     query = __has_context(message.text)
     

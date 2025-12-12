@@ -29,7 +29,7 @@ _LOGGER_CONFIGS = {
 }
 
 
-def init_logging():
+def setup_logging():
     formatter = logging.Formatter(
         (
             "%(filename)s:%(lineno)d #%(levelname)-8s "

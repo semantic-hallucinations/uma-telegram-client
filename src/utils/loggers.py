@@ -12,7 +12,7 @@ def log_handler(logger_name: str = "bot.handlers"):
             user_id = "unknown"
             if args:
                 event = args[0]
-                # Проверяем, есть ли атрибут from_user и не None ли он
+                
                 if hasattr(event, "from_user") and event.from_user:
                     user_id = event.from_user.id
 
@@ -24,7 +24,7 @@ def log_handler(logger_name: str = "bot.handlers"):
                 return result
             except Exception as e:
                 logger.error(f"Error in handler {func.__name__}: {e}", exc_info=True)
-                raise e # Пробрасываем выше, чтобы error_handler поймал
+                raise e 
         
         return wrapper
     return decorator

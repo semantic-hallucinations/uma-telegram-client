@@ -2,23 +2,23 @@ import asyncio
 import json
 
 import httpx
-from environs import Env
 
-from log import get_logger
+from config import get_logger
 
-from .message_formatter import format_rag_agent_response
-from app import WebContext
+from ..utils.message_formatter import format_rag_agent_response
+from app import web_context
 
 
 logger = get_logger("bot.services")
 
+
 #TODO: edit client depending on answer 
 class N8nClient:
-    N8N_URL = WebContext.n8n_url
+    N8N_URL = web_context.n8n_url
     MAX_RETRIES = 3
 
     @classmethod
-    async def get_response(cls, query: str) -> str:
+    async def get_answer(cls, query: str) -> str:
         for attempt in range(cls.MAX_RETRIES):
             try:
 
@@ -29,7 +29,7 @@ class N8nClient:
                         headers={"Content-Type": "application/json"},
                     )
                     response.raise_for_status()
-                    return format_rag_agent_response(response.json())
+                    return format_rag_agent_response(response.json()) #TODO: check formatting
                 
             except (httpx.RequestError, httpx.HTTPStatusError) as e:
                 logger.warning(f"Attempt {attempt + 1} failed: {str(e)}")
@@ -38,5 +38,4 @@ class N8nClient:
                     logger.error("All retry attempts failed")
                     raise RuntimeError("Failed to get response from RAG-service") from e
                 await asyncio.sleep(2**attempt * 3)
-
 
