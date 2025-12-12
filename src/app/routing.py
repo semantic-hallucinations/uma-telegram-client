@@ -12,7 +12,7 @@ group_router = Router(name="group")
 #set filters
 private_router.message.filter(F.chat.type == ChatType.PRIVATE)
 group_router.message.filter(F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP}))
-group_router.message.filter(IsBotMentioned)
+group_router.message.filter(IsBotMentioned())
 
 #set middlewares
 global_middleware = RateLimiter()

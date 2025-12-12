@@ -22,8 +22,9 @@ def log_handler(logger_name: str = "bot.handlers"):
                 result = await func(*args, **kwargs)
                 logger.info(f"Handler {func.__name__} finished success")
                 return result
+            
             except Exception as e:
-                logger.error(f"Error in handler {func.__name__}: {e}", exc_info=True)
+                logger.error(f"Error in handler {func.__name__}: {e}")
                 raise e 
         
         return wrapper

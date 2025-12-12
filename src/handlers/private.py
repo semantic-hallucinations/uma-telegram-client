@@ -9,8 +9,9 @@ from web.answer import handle_agent_answer
 
 rt: Router = private_router
 
-@log_handler("bot.handlers")
+
 @rt.message(CommandStart())
+@log_handler("bot.handlers")
 async def command_start(message: Message):
     await message.answer(
         text=(
@@ -20,8 +21,9 @@ async def command_start(message: Message):
         )
     )
 
-@log_handler("bot.handlers")
+
 @rt.message(Command(commands="help"))
+@log_handler("bot.handlers")
 async def command_help(message: Message):
     await message.answer(
         text=(
@@ -31,21 +33,24 @@ async def command_help(message: Message):
         )
     )
 
-@log_handler("bot.handlers")
+
 @rt.message(F.reply_to_message, F.text)
+@log_handler("bot.handlers")
 async def reply_message(message: Message):
     replied_text = message.reply_to_message.text
-    query = replied_text + " " + message.text
+    query = " QUOTE: " + replied_text + " QUERY: " + message.text
 
     await handle_agent_answer(query, message)
 
-@log_handler("bot.handlers")
+
 @rt.message(F.text)
+@log_handler("bot.handlers")
 async def text_message(message: Message):
     await handle_agent_answer(message.text, message)
 
-@log_handler("bot.handlers")
+
 @rt.message(~F.text)
+@log_handler("bot.handlers")
 async def non_text_message(message: Message):
     await message.answer(
         text="На данный момент бот работает только с текстовыми запросами."

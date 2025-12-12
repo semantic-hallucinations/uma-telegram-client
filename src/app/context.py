@@ -13,7 +13,7 @@ class BotContext:
     @property
     def tagged_username(self) -> str:
         tagged = self._username
-        return tagged if tagged.startswith('@') else f"{tagged}"
+        return tagged if tagged.startswith('@') else f"@{tagged}"
 
 
 @dataclass

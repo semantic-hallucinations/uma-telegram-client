@@ -7,35 +7,50 @@ from config import get_logger
 
 from utils.message_formatter import format_rag_agent_response
 from app.context import web_context
-
-
-logger = get_logger("bot.services")
+from exceptions import ServiceUnavailableError
 
 
 #TODO: edit client depending on answer 
+logger = get_logger("bot.services")
+
 class N8nClient:
-    N8N_URL = web_context.n8n_url
+    _client: httpx.AsyncClient | None = None
     MAX_RETRIES = 3
+    TIMEOUT = httpx.Timeout(120.0, connect=5.0) 
+
+    @classmethod
+    def _get_client(cls) -> httpx.AsyncClient:
+        if cls._client is None or cls._client.is_closed:
+            cls._client = httpx.AsyncClient(
+                base_url=web_context.n8n_url, 
+                timeout=cls.TIMEOUT
+            )
+        return cls._client
+
+    @classmethod
+    async def close(cls):
+        if cls._client and not cls._client.is_closed:
+            await cls._client.aclose()
 
     @classmethod
     async def get_answer(cls, query: str) -> str:
-        for attempt in range(cls.MAX_RETRIES):
+        client = cls._get_client()
+        
+        payload = {"query": query} 
+
+        for attempt in range(1, cls.MAX_RETRIES + 1):
             try:
 
-                async with httpx.AsyncClient(timeout=120.0) as client:
-                    response = await client.post(
-                        cls.N8N_URL,
-                        content=json.dumps(query),
-                        headers={"Content-Type": "application/json"},
-                    )
-                    response.raise_for_status()
-                    return format_rag_agent_response(response.json()) #TODO: check formatting
+                response = await client.post("/", json=payload)
+                response.raise_for_status()
+                return format_rag_agent_response(response.json()) #TODO: formatting!
                 
-            except (httpx.RequestError, httpx.HTTPStatusError) as e:
-                logger.warning(f"Attempt {attempt + 1} failed: {str(e)}")
-
-                if attempt == cls.MAX_RETRIES - 1:
-                    logger.error("All retry attempts failed")
-                    raise RuntimeError("Failed to get response from N8n-service") from e
-                await asyncio.sleep(2**attempt * 3)
+            except httpx.HTTPError as e:
+                logger.warning(f"Attempt {attempt} failed: {e}")
+                
+                if attempt == cls.MAX_RETRIES:
+                    logger.error("All N8n retry attempts failed")
+                    raise ServiceUnavailableError("Failed to get response from N8n-service") from e
+                
+                await asyncio.sleep(2 ** (attempt - 1))
 
