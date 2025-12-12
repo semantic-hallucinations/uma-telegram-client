@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+from config import load_config
 
 @dataclass
 class BotContext:
@@ -21,3 +21,9 @@ class WebContext:
     n8n_url: str
 
 
+
+
+_cfg = load_config()
+
+bot_context = BotContext(_cfg.tg_Bot.username)
+web_context = WebContext(_cfg.web.n8n_url)

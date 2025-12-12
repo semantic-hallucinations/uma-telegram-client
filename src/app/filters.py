@@ -1,6 +1,6 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
-from app import bot_context
+from .context import bot_context
 
 
 class IsBotMentioned(BaseFilter):

@@ -5,8 +5,8 @@ import httpx
 
 from config import get_logger
 
-from ..utils.message_formatter import format_rag_agent_response
-from app import web_context
+from utils.message_formatter import format_rag_agent_response
+from app.context import web_context
 
 
 logger = get_logger("bot.services")
@@ -36,6 +36,6 @@ class N8nClient:
 
                 if attempt == cls.MAX_RETRIES - 1:
                     logger.error("All retry attempts failed")
-                    raise RuntimeError("Failed to get response from RAG-service") from e
+                    raise RuntimeError("Failed to get response from N8n-service") from e
                 await asyncio.sleep(2**attempt * 3)
 

@@ -4,7 +4,7 @@ from aiogram.exceptions import TelegramBadRequest
 from .client import N8nClient
 
 async def handle_agent_answer(query: str, message: Message):
-    answer = N8nClient.get_answer(query) 
+    answer = await N8nClient.get_answer(query) 
     try:
         await message.answer(answer) #TODO: add parsemode if necessary
     

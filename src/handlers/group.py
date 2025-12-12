@@ -3,7 +3,7 @@ from aiogram.types import Message
 
 from app.routing import group_router
 from web.answer import handle_agent_answer
-from config import log_handler
+from utils import log_handler
 
 
 rt: Router = group_router

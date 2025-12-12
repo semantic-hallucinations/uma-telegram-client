@@ -3,7 +3,7 @@ from aiogram.types import Message
 from aiogram.filters import Command, CommandStart
 
 from app.routing import private_router
-from config import log_handler
+from utils import log_handler
 from web.answer import handle_agent_answer
 
 

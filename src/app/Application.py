@@ -1,11 +1,9 @@
 from typing import List
-from logging import Logger
 
 import asyncio
 from aiogram import Bot, Dispatcher, Router
 
 from config import Config, load_config, setup_logging, get_logger
-from .context import BotContext, WebContext
 from .routing import routers
 from handlers.errors import global_error_handler
 
@@ -37,38 +35,19 @@ class Application:
         logger.debug("Application initialized successfully")
 
 
-    @property
-    def bot_context(self) -> BotContext:
-        logger.debug("Create bot context")
-        #set bot username into context
-        username = self._config.tg_Bot.username
-
-        return BotContext(
-            _username=username)
-    
-    @property
-    def web_context(self) -> WebContext:
-        logger.debug("create web context")
-        n8n_addr_url = self._config.web.n8n_url
-
-        return WebContext(
-            n8n_url=n8n_addr_url
-        )
-
-
     #run bot event loop
-    def start(self, webhook=False | None):
+    def start(self, webhook: bool | None = None):
         logger.info("Starting bot")
         #TODO: congigure webhook
         # if webhook:
         #     pass
 
-        asyncio.run(self._start_polling())
+        asyncio.run(self._run_polling())
 
 
     def _set_routers(self, routers: list[Router]):
         logger.debug("Set routers")
-        self._dispatcher.include_routers(routers)
+        self._dispatcher.include_routers(*routers)
 
     def _set_error_handler(self, handler):
         logger.debug("Set error handler")
@@ -81,5 +60,3 @@ class Application:
 
 
 application = Application()
-bot_context: BotContext = application.bot_context
-web_context: WebContext = application.web_context
