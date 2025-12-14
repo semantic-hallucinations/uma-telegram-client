@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  telegram-bot:
+    build: .
+    container_name: uma_bot_client
+    restart: unless-stopped
+    
+    env_file:
+      - .env
+    
+    volumes:
+      - ./logs:/app/src/logs
