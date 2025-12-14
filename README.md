@@ -20,7 +20,7 @@ N8N_ANSWER_FORMAT=DEFAULT #optional. if parse mode not defined - it will be DAFA
 
 Бот токен и юзернейм я дам. Адрес n8n я не дам.
 
-запускаем:
+запускаем из корня репозитория:
 
 ```
 docker-compose up --build
