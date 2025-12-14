@@ -40,7 +40,7 @@ class N8nClient:
         for attempt in range(1, cls.MAX_RETRIES + 1):
             try:
                 #TODO: define endpoint address 
-                response = await client.post("/", json=payload)
+                response = await client.post("/webhook/pipeline", json=payload)
                 response.raise_for_status()
                 return format_json_body(response.json()) 
                 
