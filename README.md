@@ -1,6 +1,6 @@
 # uma-telegram-client
 
-## Как запускать это чучело локально
+## Как запускать это чучело локально с docker-compose
 
 создать .env - его я дам.
 
@@ -26,7 +26,7 @@ N8N_ANSWER_FORMAT=DEFAULT #optional. if parse mode not defined - it will be DAFA
 docker-compose up --build
 ```
 
-Пишем боту в тг: @bsuir_assistant_bot либо добавляем в группу и тегаем.
+Пишем боту в тг: @bsuir_assistant_bot либо добавляем в группу и тегаем бота
 
 Вы превосходны
 
