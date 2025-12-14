@@ -11,6 +11,7 @@ class BotEnv:
 @dataclass
 class WebEnv:
     n8n_url: str
+    n8n_answer_format: str
 
 
 @dataclass
@@ -29,6 +30,7 @@ def load_config(path: str | None = None) -> Config:
             username=env("BOT_USERNAME")
         ),
         web=WebEnv(
-            n8n_url=env("N8N_SERVICE_ADDR")
+            n8n_url=env("N8N_SERVICE_ADDR"),
+            n8n_answer_format=env(name="N8N_ANSWER_FORMAT", default="DEFAULT")
         )
     )

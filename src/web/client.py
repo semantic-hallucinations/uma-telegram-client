@@ -5,12 +5,11 @@ import httpx
 
 from config import get_logger
 
-from utils.message_formatter import format_rag_agent_response
+from utils.formatters import format_json_body
 from app.context import web_context
 from exceptions import ServiceUnavailableError
 
 
-#TODO: edit client depending on answer 
 logger = get_logger("bot.services")
 
 class N8nClient:
@@ -40,10 +39,10 @@ class N8nClient:
 
         for attempt in range(1, cls.MAX_RETRIES + 1):
             try:
-
+                #TODO: define endpoint address 
                 response = await client.post("/", json=payload)
                 response.raise_for_status()
-                return format_rag_agent_response(response.json()) #TODO: formatting!
+                return format_json_body(response.json()) 
                 
             except httpx.HTTPError as e:
                 logger.warning(f"Attempt {attempt} failed: {e}")

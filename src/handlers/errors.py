@@ -6,7 +6,7 @@ from config import get_logger
 logger = get_logger("bot.handlers")
 
 async def service_error_handler(event: ErrorEvent):
-    logger.error(f"External API Error: {event.exception}", exec_info=True )
+    logger.error(f"External API Error: {event.exception}", exc_info=True )
     
     if event.update.message:
         await event.update.message.answer(
