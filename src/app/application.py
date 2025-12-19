@@ -7,7 +7,7 @@ from aiogram.filters import ExceptionTypeFilter
 from config import Config, load_config, setup_logging, get_logger
 from .routing import routers
 from handlers.errors import global_error_handler, service_error_handler
-from exceptions import ServiceUnavailableError
+from utils.exceptions import ServiceUnavailableError
 from web.client import N8nClient
 
 import handlers.private

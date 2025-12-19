@@ -1,55 +1,110 @@
 import asyncio
-import json
-
+from typing import Any, Dict, Optional
 import httpx
 
 from config import get_logger
-
-from utils.formatters import format_json_body
 from app.context import web_context
-from exceptions import ServiceUnavailableError
-
+from utils.exceptions import ServiceUnavailableError
+from utils.formatters import format_json_body
+from app.enums import EventInitiator, EventType
 
 logger = get_logger("bot.services")
 
-class N8nClient:
-    _client: httpx.AsyncClient | None = None
-    MAX_RETRIES = 3
-    TIMEOUT = httpx.Timeout(120.0, connect=5.0) 
+class BaseWebClient:
+    MAX_RETRIES = 3 
+    DEFAULT_TIMEOUT = httpx.Timeout(120.0, connect=5.0)
 
-    @classmethod
-    def _get_client(cls) -> httpx.AsyncClient:
-        if cls._client is None or cls._client.is_closed:
-            cls._client = httpx.AsyncClient(
-                base_url=web_context.n8n_url, 
-                timeout=cls.TIMEOUT
+    def __init__(self, base_url: str):
+        self.base_url = base_url
+        self._client: Optional[httpx.AsyncClient] = None
+
+    async def _get_client(self) -> httpx.AsyncClient:
+        if self._client is None or self._client.is_closed:
+            self._client = httpx.AsyncClient(
+                base_url=self.base_url,
+                timeout=self.DEFAULT_TIMEOUT
             )
-        return cls._client
+        return self._client
 
-    @classmethod
-    async def close(cls):
-        if cls._client and not cls._client.is_closed:
-            await cls._client.aclose()
+    async def close(self):
+        if self._client and not self._client.is_closed:
+            await self._client.aclose()
 
-    @classmethod
-    async def get_answer(cls, query: str, user_id) -> str:
-        client = cls._get_client()
+
+    async def _request(
+        self, 
+        method: str, 
+        endpoint: str, 
+        json: Optional[Dict] = None, 
+        params: Optional[Dict] = None,
+        max_attempts: int = None  
+    ) -> Any:
+        client = await self._get_client()
         
-        payload = {"query": query, "sessionId":user_id} 
+        
+        attempts_count = max_attempts if max_attempts is not None else self.MAX_RETRIES
+        
+        for attempt in range(1, attempts_count + 1):
 
-        for attempt in range(1, cls.MAX_RETRIES + 1):
             try:
-                #TODO: define endpoint address 
-                response = await client.post("/webhook/pipeline", json=payload)
+                response = await client.request(method, endpoint, json=json, params=params)
                 response.raise_for_status()
-                return format_json_body(response.json()) 
+                return response.json()
                 
             except httpx.HTTPError as e:
-                logger.warning(f"Attempt {attempt} failed: {e}")
                 
-                if attempt == cls.MAX_RETRIES:
-                    logger.error("All N8n retry attempts failed")
-                    raise ServiceUnavailableError("Failed to get response from N8n-service") from e
+                if attempts_count > 1:
+                    logger.warning(f"Request to {endpoint} failed (Attempt {attempt}/{attempts_count}): {e}")
+                
+                if attempt == attempts_count:
+                
+                    raise ServiceUnavailableError(f"Failed to communicate with {self.base_url}") from e
                 
                 await asyncio.sleep(2 ** (attempt - 1))
 
+
+class N8nClient(BaseWebClient):
+    def __init__(self):
+        super().__init__(base_url=web_context.n8n_url)
+
+    async def get_answer(self, query: str) -> str:
+        payload = {
+            "query": query
+        }
+        data = await self._request("POST", "/webhook/pipeline", json=payload)
+        
+        return format_json_body(data)
+
+
+class EventStorageClient(BaseWebClient):
+    def __init__(self):
+        super().__init__(base_url=web_context.event_storage_url)
+
+    async def save_event(
+        self, 
+        telegram_user_id: int, 
+        initiator: str, 
+        event_type: str, 
+        content: str = None, 
+        meta_data: Dict = None
+    ) -> None:
+        payload = {
+            "telegramUserId": telegram_user_id,
+            "initiator": initiator,
+            "type": event_type,
+            "content": content,
+            "metaData": meta_data
+        }
+        
+        try:
+            await self._request("POST", "/api/events/telegram", json=payload, max_attempts=1)
+        except Exception as e:
+            logger.error(f"Failed to save event log: {e}")
+
+    async def get_context(self, telegram_user_id: int, limit: int = 10) -> list[dict]:
+        params = {"limit": limit}
+        return await self._request("GET", f"/api/events/telegram/context/{telegram_user_id}", params=params)
+
+
+n8n_client = N8nClient()
+event_storage_client = EventStorageClient()

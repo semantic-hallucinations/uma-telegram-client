@@ -33,6 +33,7 @@ class BotContext:
 class WebContext:
     n8n_url: str
     n8n_answer_format: str
+    event_storage_url: str
 
 
 
@@ -42,6 +43,7 @@ _cfg = load_config()
 bot_context = BotContext(_cfg.tg_Bot.username)
 web_context = WebContext(
     _cfg.web.n8n_url,
-    _cfg.web.n8n_answer_format
+    _cfg.web.n8n_answer_format,
+    _cfg.web.event_storage_url
 )
 

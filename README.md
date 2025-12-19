@@ -32,7 +32,7 @@ docker-compose up --build
 
 ## Входы - выходы ВАЖНО
 
-Бот отправляет на адрес: {N8N_SERVICE_ADDR}/ (СКАЗАТЬ МНЕ АДРЕС ЭНДПОИНТА ПОТОМ. Либо правьте файл src/web/client.py) http-сообщение с телом:
+Бот отправляет на адрес: {N8N_SERVICE_ADDR}/webhook/pipeline http-сообщение с телом:
 
 
 ```
