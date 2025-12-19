@@ -12,7 +12,7 @@ async def handle_agent_answer(query: str, message: Message):
     #                      "\n Мой контекст: " + query)
     # return
     
-    answer = await N8nClient.get_answer(query)
+    answer = await N8nClient.get_answer(query, message.from_user.id)
 
     answer_format: str = web_context.n8n_answer_format
     msg_parse_mode = bot_context.supported_parse_modes[answer_format]

@@ -32,10 +32,10 @@ class N8nClient:
             await cls._client.aclose()
 
     @classmethod
-    async def get_answer(cls, query: str) -> str:
+    async def get_answer(cls, query: str, user_id) -> str:
         client = cls._get_client()
         
-        payload = {"query": query} 
+        payload = {"query": query, "sessionId":user_id} 
 
         for attempt in range(1, cls.MAX_RETRIES + 1):
             try:
