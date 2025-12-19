@@ -14,53 +14,48 @@ async def handle_agent_answer(query: str, message: Message):
     #                      "\n Мой контекст: " + query)
     # return
     
-    #save user message event
-    user_id = message.from_user.id
 
+    user_id = message.from_user.id
+    schedule_log(user_id, EventInitiator.USER, EventType.MESSAGE, query) # save user message
+
+    try:
+        answer = await n8n_client.get_answer(query) #wait a rag-pipeline answer
+    except Exception as e:
+        await message.answer("Извините, сервис временно недоступен.")
+        schedule_log(user_id, EventInitiator.SYSTEM, EventType.ERROR, f"N8n Error: {str(e)}")
+        return
+
+    answer_format = web_context.n8n_answer_format
+    msg_parse_mode = bot_context.supported_parse_modes.get(answer_format) #parse md or html
+    
+    final_answer_text = answer
+
+    try:
+        await message.answer(answer, parse_mode=msg_parse_mode) #answer to user in chat
+        
+    except TelegramBadRequest:
+        final_answer_text = clean_tags(answer, answer_format)
+        await message.answer(final_answer_text) #parse error - send without formatting
+        
+    finally:
+        schedule_log(user_id, EventInitiator.ASSISTANT, EventType.MESSAGE, final_answer_text)
+
+
+
+def schedule_log(user_id: int, initiator: str, event_type: str, content: str):
+    """
+    Обертка для запуска фоновой задачи сохранения лога.
+    Работает по принципу Fire-and-Forget.
+    """
     asyncio.create_task(
         event_storage_client.save_event(
             telegram_user_id=user_id,
-            initiator="EventInitiator.USER",       
-            event_type="EventType.MESSAGE", 
-            content=query
-        )
-    )
-    
-    try:
-        answer = await n8n_client.get_answer(query)
-    except Exception as e:
-        await message.answer("Извините, сервис временно недоступен.")
-        
-        asyncio.create_task(
-            event_storage_client.save_event(
-                telegram_user_id=user_id,
-                initiator="SYSTEM",
-                event_type="ERROR",
-                content=f"N8n Error: {str(e)}"
-            )
-        )
-        return
-
-    answer_format: str = web_context.n8n_answer_format
-    msg_parse_mode = bot_context.supported_parse_modes.get(answer_format)
-
-    final_answer_text = answer
-    try:
-        await message.answer(answer, parse_mode=msg_parse_mode) 
-    
-    except TelegramBadRequest:
-        final_answer_text = clean_tags(answer, answer_format)
-        await message.answer(final_answer_text)
-        
-    finally:
-        asyncio.create_task(
-        event_storage_client.save_event(
-            telegram_user_id=user_id,
-            initiator=EventInitiator.ASSISTANT,   
-            event_type=EventType.MESSAGE,      
-            content=final_answer_text
+            initiator=initiator,
+            event_type=event_type,
+            content=content
         )
     )
 
     
+
 
