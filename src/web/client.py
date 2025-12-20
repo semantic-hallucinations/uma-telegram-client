@@ -95,9 +95,13 @@ class EventStorageClient(BaseWebClient):
             "content": content,
             "metaData": meta_data
         }
-        logger.info(f"Send event to {web_context.event_storage_url}")
+
+        method = "POST"
+        endpoint_addr = "/api/events/telegram"
+        logger.info(f"Sending event to {method} {web_context.event_storage_url}{endpoint_addr}")
         try:
-            await self._request("POST", "/api/events/telegram", json=payload, max_attempts=1)
+            await self._request(method, endpoint_addr, json=payload, max_attempts=1)
+            logger.info(f"Request sended successfully to {method} {web_context.event_storage_url}{endpoint_addr}")
         except Exception as e:
             logger.error(f"Failed to save event log: {e}")
 

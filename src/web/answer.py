@@ -2,7 +2,8 @@ import asyncio
 from aiogram.types import Message
 from aiogram.exceptions import TelegramBadRequest
 
-from .client import n8n_client, event_storage_client
+from .client import n8n_client
+from app.scheduler import schedule_log
 
 from app.context import bot_context, web_context
 from app.enums import EventInitiator, EventType
@@ -13,17 +14,16 @@ from config import get_logger
 logger = get_logger("bot.services")
 
 async def handle_agent_answer(query: str, message: Message):
-    await message.answer("Арбузный привет! \n Твоё сообщение: " + message.text + 
-                         "\n Мой контекст: " + query)
-    return
+    # await message.answer("Арбузный привет! \n Твоё сообщение: " + message.text + 
+    #                      "\n Мой контекст: " + query)
+    # return
 
     logger.info("handling agent answer")
 
     user_id = message.from_user.id
-    schedule_log(user_id, EventInitiator.USER, EventType.MESSAGE, query) # save user message
 
     try:
-        answer = await n8n_client.get_answer(query) #wait a rag-pipeline answer
+        answer = await n8n_client.get_answer(query) #wait for a rag-pipeline answer
     except Exception as e:
         await message.answer("Извините, сервис временно недоступен.")
         schedule_log(user_id, EventInitiator.SYSTEM, EventType.ERROR, f"N8n Error: {str(e)}")
@@ -46,19 +46,7 @@ async def handle_agent_answer(query: str, message: Message):
 
 
 
-def schedule_log(user_id: int, initiator: str, event_type: str, content: str):
-    """
-    Обертка для запуска фоновой задачи сохранения лога.
-    Работает по принципу Fire-and-Forget.
-    """
-    asyncio.create_task(
-        event_storage_client.save_event(
-            telegram_user_id=user_id,
-            initiator=initiator,
-            event_type=event_type,
-            content=content
-        )
-    )
+
 
     
 
