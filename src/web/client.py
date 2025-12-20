@@ -95,7 +95,7 @@ class EventStorageClient(BaseWebClient):
             "content": content,
             "metaData": meta_data
         }
-        
+        logger.info(f"Send event to {web_context.event_storage_url}")
         try:
             await self._request("POST", "/api/events/telegram", json=payload, max_attempts=1)
         except Exception as e:

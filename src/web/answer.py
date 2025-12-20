@@ -8,12 +8,16 @@ from app.context import bot_context, web_context
 from app.enums import EventInitiator, EventType
 from utils.formatters import clean_tags
 
+from config import get_logger
+
+logger = get_logger("bot.services")
 
 async def handle_agent_answer(query: str, message: Message):
-    # await message.answer("Арбузный привет! \n Твоё сообщение: " + message.text + 
-    #                      "\n Мой контекст: " + query)
-    # return
-    
+    await message.answer("Арбузный привет! \n Твоё сообщение: " + message.text + 
+                         "\n Мой контекст: " + query)
+    return
+
+    logger.info("handling agent answer")
 
     user_id = message.from_user.id
     schedule_log(user_id, EventInitiator.USER, EventType.MESSAGE, query) # save user message
