@@ -67,9 +67,10 @@ class N8nClient(BaseWebClient):
     def __init__(self):
         super().__init__(base_url=web_context.n8n_url)
 
-    async def get_answer(self, query: str) -> str:
+    async def get_answer(self, query: str, sessionId: int) -> str:
         payload = {
-            "query": query
+            "query": query,
+            "sessionId": sessionId
         }
         data = await self._request("POST", "/webhook/pipeline", json=payload)
         
