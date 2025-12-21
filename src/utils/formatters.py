@@ -6,7 +6,6 @@ logger = get_logger("bot.services")
 
 #handle json-body of response
 def format_json_body(response_body: dict) -> str:
-    #TODO: check response-body format logic
     logger.debug("format response-json body")
 
     answer = response_body.get("response", "")
@@ -19,11 +18,15 @@ def format_json_body(response_body: dict) -> str:
 
 def _format_uncertain_payload(payload: dict) -> str:
     logger.warning(f"format uncertain payload. Response json structure differs from default: {payload}")
-    response_str: str
+    
+    response_str = "" 
+    if not payload:
+        return "Empty response from service"
+    
     for (k,v) in payload.items():
         response_str += f"\n\n {v}"
     
-    return response_str
+    return response_str.strip()
 
 
 def clean_tags(f_text:str, parsemode: str) -> str:
@@ -39,9 +42,7 @@ def clean_tags(f_text:str, parsemode: str) -> str:
 
 
 def _clean_markdown(text: str) -> str:
-    """
-    Очищает текст от Markdown разметки, сохраняя читаемость.
-    """
+
     text = re.sub(r"(?m)^\s{0,3}#+\s*", "", text)
 
     text = re.sub(r"(\*\*|__|~~|[*_`])", "", text)
@@ -56,9 +57,7 @@ def _clean_markdown(text: str) -> str:
 
 
 def _clean_html(text: str) -> str:
-    """
-    Удаляет HTML теги и декодирует сущности (например, &quot; -> ").
-    """
+
     text = re.sub(r"<[^>]+>", "", text)
 
     text = html.unescape(text)

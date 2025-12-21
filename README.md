@@ -12,6 +12,8 @@ BOT_USERNAME=username_bot #bot username. MUST BE WRITTEN WITHOUT '@'
 
 N8N_SERVICE_ADDR=http://localhost:8080 #n8n service address
 N8N_ANSWER_FORMAT=DEFAULT #optional. if parse mode not defined - it will be DAFAULT.
+
+EVENT_STORAGE_ADDR=http://localhost:8081 #event-storage address
 ```
 
 - парс мод опциональный: можно указать MARKDOWN, HTML - смотря как модель форматирует ответ.
@@ -32,11 +34,14 @@ docker-compose up --build
 
 ## Входы - выходы ВАЖНО
 
-Бот отправляет на адрес: {N8N_SERVICE_ADDR}/ (СКАЗАТЬ МНЕ АДРЕС ЭНДПОИНТА ПОТОМ. Либо правьте файл src/web/client.py) http-сообщение с телом:
+Бот отправляет на адрес: {N8N_SERVICE_ADDR}/webhook/pipeline http-сообщение с телом:
 
 
-```
-{"query":"строка с сообщением пользователя из телеграм"}
+```json
+{
+    "query":"строка с сообщением пользователя из телеграм",
+    "sessionId":123456789 //число с id телеграм-юзера
+}
 ```
 
 Бот ожидает в ответ получить http с таким телом:
@@ -46,3 +51,14 @@ docker-compose up --build
 ```
 
 Но в целом распарсит любое и кинет в чат юзеру.
+
+--- 
+
+## Обновы
+
+Теперь бот сохраняет ивенты в event-storage: сообщения, команды, ошибки. 
+
+С поддерживаемыми типами ивентов можно ознакомиться в [репе](https://github.com/semantic-hallucinations/uma-event-storage)
+
+
+В целом если сервис отвалится бот продолжит работу в штатном режиме, но мы потеряем часть истории просто не сохранится в сторедже. Хотелось бы, чтобы он не отваливался.

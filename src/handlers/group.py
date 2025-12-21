@@ -5,6 +5,8 @@ from app.routing import group_router
 from web.answer import handle_agent_answer
 from utils import log_handler
 from app.context import bot_context
+from app.scheduler import schedule_log
+from app.enums import EventInitiator, EventType
 
 rt: Router = group_router
 
@@ -17,6 +19,8 @@ async def reply_message(message: Message):
     if msg_text:
         replied_text = __strip_bot_username(message.reply_to_message.text) 
         query = "QUOTE: " + replied_text + " QUERY: " + msg_text
+
+        schedule_log(message.from_user.id, EventInitiator.USER, EventType.MESSAGE, query)
         await handle_agent_answer(query, message)
 
 
@@ -26,6 +30,7 @@ async def text_message(message: Message):
     query = __strip_bot_username(message.text)
     
     if query:
+        schedule_log(message.from_user.id, EventInitiator.USER, EventType.MESSAGE, query)
         await handle_agent_answer(query, message)
 
 

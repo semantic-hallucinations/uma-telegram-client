@@ -12,6 +12,7 @@ class BotEnv:
 class WebEnv:
     n8n_url: str
     n8n_answer_format: str
+    event_storage_url:str
 
 
 @dataclass
@@ -31,6 +32,7 @@ def load_config(path: str | None = None) -> Config:
         ),
         web=WebEnv(
             n8n_url=env("N8N_SERVICE_ADDR"),
-            n8n_answer_format=env(name="N8N_ANSWER_FORMAT", default="DEFAULT")
+            n8n_answer_format=env(name="N8N_ANSWER_FORMAT", default="DEFAULT"),
+            event_storage_url=env(name="EVENT_STORAGE_ADDR", default="NO_ADDR")
         )
     )
