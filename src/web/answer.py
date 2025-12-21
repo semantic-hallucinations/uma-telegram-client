@@ -23,9 +23,11 @@ async def handle_agent_answer(query: str, message: Message):
     user_id = message.from_user.id
 
     try:
+        logger.info("sending request to n8n")
         answer = await n8n_client.get_answer(query) #wait for a rag-pipeline answer
     except Exception as e:
         await message.answer("Извините, сервис временно недоступен.")
+        logger.error(f"Error while sending request to n8n: {e}", )
         schedule_log(user_id, EventInitiator.ASSISTANT, EventType.ERROR, f"N8n Error: {str(e)}")
         return
 
@@ -35,9 +37,11 @@ async def handle_agent_answer(query: str, message: Message):
     final_answer_text = answer
 
     try:
+        logger.info(f"send answer to user with parsemode {msg_parse_mode}")
         await message.answer(answer, parse_mode=msg_parse_mode) #answer to user in chat
         
     except TelegramBadRequest:
+        logger.info(f"send answer to user with cleaned tags")
         final_answer_text = clean_tags(answer, answer_format)
         await message.answer(final_answer_text) #parse error - send without formatting
         

@@ -47,8 +47,10 @@ class BaseWebClient:
         for attempt in range(1, attempts_count + 1):
 
             try:
+                logger.info("Sending request to {method} {endpoint}")
                 response = await client.request(method, endpoint, json=json, params=params)
                 response.raise_for_status()
+                logger.info("Request to {method} {endpoint} was sended successfully")
                 return response.json()
                 
             except httpx.HTTPError as e:
@@ -68,12 +70,15 @@ class N8nClient(BaseWebClient):
         super().__init__(base_url=web_context.n8n_url)
 
     async def get_answer(self, query: str, sessionId: int) -> str:
+        method = "POST"
+        endpoint = "/webhook/pipeline"
         payload = {
             "query": query,
             "sessionId": sessionId
         }
-        data = await self._request("POST", "/webhook/pipeline", json=payload)
-        
+        logger.info("sending request from n8n-client to {method} {endpoint}")
+        data = await self._request(method, endpoint, json=payload)
+        logger.info("Request from n8n-client to {method} {endpoint} successed")
         return format_json_body(data)
 
 
