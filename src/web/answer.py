@@ -26,7 +26,7 @@ async def handle_agent_answer(query: str, message: Message):
         answer = await n8n_client.get_answer(query) #wait for a rag-pipeline answer
     except Exception as e:
         await message.answer("Извините, сервис временно недоступен.")
-        schedule_log(user_id, EventInitiator.SYSTEM, EventType.ERROR, f"N8n Error: {str(e)}")
+        schedule_log(user_id, EventInitiator.ASSISTANT, EventType.ERROR, f"N8n Error: {str(e)}")
         return
 
     answer_format = web_context.n8n_answer_format
