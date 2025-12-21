@@ -24,7 +24,7 @@ async def handle_agent_answer(query: str, message: Message):
 
     try:
         logger.info("sending request to n8n")
-        answer = await n8n_client.get_answer(query) #wait for a rag-pipeline answer
+        answer = await n8n_client.get_answer(query, message.from_user.id) #wait for a rag-pipeline answer
     except Exception as e:
         await message.answer("Извините, сервис временно недоступен.")
         logger.error(f"Error while sending request to n8n: {e}", )
